@@ -4,15 +4,14 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 
-import { getTodosForUser as getTodosForUser } from '../../businessLogic/todos'
-import { getUserId } from '../utils'
-import { createLogger } from '../../utils/logger'
+import { getFilesForUser } from '../../../businessLogic/files'
+import { createLogger } from '../../../utils/logger'
+import { getUserId } from '../../utils'
 
-const logger = createLogger('TodosAccess')
-// TODO: Get all TODO items for a current user
+const logger = createLogger('File')
+
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    // Write your code here
     const userId = getUserId(event)
     if (!userId) {
       return {
@@ -20,10 +19,10 @@ export const handler = middy(
         body: 'Unauthorized'
       }
     }
-    const todos = await getTodosForUser(userId)
+    const files = await getFilesForUser(userId)
     return {
       statusCode: 200,
-      body: JSON.stringify({ items: todos })
+      body: JSON.stringify({ items: files })
     }
   }
 )

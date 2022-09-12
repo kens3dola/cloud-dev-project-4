@@ -4,25 +4,27 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
 
-import { updateTodo } from '../../businessLogic/todos'
-import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
-import { getUserId } from '../utils'
+import { deleteFile } from '../../../businessLogic/files'
+import { getUserId } from '../../utils'
+import { createLogger } from '../../../utils/logger'
 
+const logger = createLogger('deleteFile')
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const todoId = event.pathParameters.todoId
-    const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
-    // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
+    const fileId = event.pathParameters.fileId
+    // TODO: Remove a TODO item by id
     const userId = getUserId(event)
+    logger.info(`Deleting file id: ${fileId} for user id: ${userId}`)
     if (!userId) {
       return {
         statusCode: 401,
         body: 'Unauthorized'
       }
     }
-    await updateTodo(todoId, updatedTodo, userId)
+    await deleteFile(fileId, userId)
+    logger.info('Deleted')
     return {
-      statusCode: 201,
+      statusCode: 200,
       body: ''
     }
   }

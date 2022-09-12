@@ -3,32 +3,32 @@ import 'source-map-support/register'
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import * as middy from 'middy'
 import { cors, httpErrorHandler } from 'middy/middlewares'
+import {
+  createFile,
+  createFilePresignedUrl
+} from '../../../businessLogic/files'
+import { createLogger } from '../../../utils/logger'
+import { getUserId } from '../../utils'
 
-import { createAttachmentPresignedUrl } from '../../businessLogic/todos'
-import { getUserId } from '../utils'
-import { AttachmentUtils } from '../../fileStorage/attachmentUtils'
-
+const logger = createLogger('fileUrl')
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const todoId = event.pathParameters.todoId
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+    const fileName = event['queryStringParameters']['name']
     const userId = getUserId(event)
+    logger.info(`creating upload url for user: ${userId}`)
     if (!userId) {
       return {
         statusCode: 401,
         body: 'Unauthorized'
       }
     }
-    const presignedUrl = await createAttachmentPresignedUrl(todoId)
-    await new AttachmentUtils().updateTodoAttachmentUrl(
-      todoId,
-      presignedUrl,
-      userId
-    )
+    const presignedUrl = await createFilePresignedUrl()
+    logger.info(`URL created: ${presignedUrl}`)
+    const result = await createFile(userId, presignedUrl, fileName)
     return {
-      statusCode: 200,
+      statusCode: 201,
       body: JSON.stringify({
-        uploadUrl: presignedUrl
+        item: result
       })
     }
   }

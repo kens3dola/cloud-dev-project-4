@@ -11,7 +11,7 @@ const s3 = new XAWS.S3({
 })
 
 const logger = createLogger('TodosAccess')
-const bucket = process.env.ATTACHMENT_S3_BUCKET
+const bucket = process.env.S3_BUCKET
 const expiration = process.env.SIGNED_URL_EXPIRATION
 
 // TODO: Implement the dataLayer logic

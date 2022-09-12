@@ -12,7 +12,7 @@ const s3 = new XAWS.S3({
 })
 
 const logger = createLogger('AttachmentUtils')
-const bucket = process.env.TODOS_S3_BUCKET
+const bucket = process.env.S3_BUCKET
 const expiration = process.env.SIGNED_URL_EXPIRATION
 
 // TODO: Implement the dataLayer logic
@@ -52,6 +52,18 @@ export class AttachmentUtils {
         }
       })
       .promise()
+  }
+  async createFilePresignedUrl() {
+    logger.info('Getting upload url file: ')
+    try {
+      return await s3.getSignedUrl('putObject', {
+        Bucket: bucket,
+        Key: `i-${Math.ceil(Math.random() * 10 ** 10)}`,
+        Expires: parseInt(expiration)
+      })
+    } catch (error) {
+      logger.error('Error get signed url: ' + JSON.stringify(error))
+    }
   }
 }
 

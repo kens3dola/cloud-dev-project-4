@@ -4,6 +4,7 @@ import { Grid, Menu, Segment } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
 import { EditTodo } from './components/EditTodo'
+import { Files } from './components/Files'
 import { LogIn } from './components/LogIn'
 import { NotFound } from './components/NotFound'
 import { Todos } from './components/Todos'
@@ -92,7 +93,12 @@ export default class App extends Component<AppProps, AppState> {
           path="/"
           exact
           render={props => {
-            return <Todos {...props} auth={this.props.auth} />
+            return (
+              <>
+              <Todos {...props} auth={this.props.auth} />
+              <Files {...props} auth={this.props.auth} />
+              </>
+            )
           }}
         />
 
